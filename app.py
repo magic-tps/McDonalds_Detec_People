@@ -1,7 +1,11 @@
 import streamlit as st
 import numpy as np
-from ultralytics import YOLO
 import cv2
+import pygame  # Usaremos pygame para reproducir el sonido
+from ultralytics import YOLO
+
+# Inicializamos pygame para reproducir sonidos
+pygame.mixer.init()
 
 # Cargar el modelo YOLOv8
 model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisión
@@ -15,6 +19,11 @@ frame = None
 
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
+
+# Función para generar una alerta sonora
+def alerta_sonora():
+    pygame.mixer.music.load("https://www.soundjay.com/button/beep-07.wav")  # Usar un sonido predefinido
+    pygame.mixer.music.play()
 
 # Verificar si se ha capturado una imagen
 if camera_input:
@@ -39,6 +48,10 @@ if camera_input:
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame, f"Person {conf:.2f}", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+    # Si detectó una persona, activar la alerta sonora
+    if detected:
+        alerta_sonora()
 
     # Mostrar la imagen con detección en Streamlit
     stframe.image(frame, channels="BGR", use_column_width=True)
