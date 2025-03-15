@@ -18,8 +18,8 @@ camera_input = st.camera_input("Captura desde tu cámara")
 
 # Función para generar una alerta sonora utilizando st.audio()
 def alerta_sonora():
-    # Usar una URL de un archivo de audio en formato .mp3 o .wav
-    audio_file = "https://www.soundjay.com/button/beep-07.wav"  # O reemplaza por una URL de tu propio sonido
+    # URL de un archivo de audio de alerta (sonido de beep)
+    audio_file = "https://www.soundjay.com/button/beep-07.wav"  # Reemplaza por una URL de un sonido de tu preferencia
     st.audio(audio_file, format="audio/wav", start_time=0)
 
 # Verificar si se ha capturado una imagen
