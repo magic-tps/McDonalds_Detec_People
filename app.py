@@ -6,17 +6,13 @@ import base64
 import streamlit.components.v1 as components
 
 # Cargar el modelo YOLOv8
-model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisión
+model = YOLO("yolov8n.pt")
 
 # Configurar Streamlit
 st.title("Detección de Personas en Tiempo Real")
-start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
+start = st.checkbox("Iniciar detección")
 
 stframe = st.empty()  # Espacio para mostrar la imagen
-frame = None
-
-# Usar el widget de cámara de Streamlit
-camera_input = st.camera_input("Captura desde tu cámara")
 
 # Función para generar una alerta sonora utilizando JavaScript
 def alerta_sonora():
@@ -25,11 +21,16 @@ def alerta_sonora():
         <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
     </audio>
     """
-    audio_file = open("audio.wav", "rb").read()
-    audio_base64 = base64.b64encode(audio_file).decode('utf-8')
-    components.html(audio_html.format(audio_base64=audio_base64), height=0)
+    try:
+        audio_file = open("audio.wav", "rb").read()
+        audio_base64 = base64.b64encode(audio_file).decode('utf-8')
+        components.html(audio_html.format(audio_base64=audio_base64), height=0)
+    except Exception as e:
+        st.error(f"Error al cargar el archivo de audio: {e}")
 
-# Verificar si se ha capturado una imagen
+# Usar el widget de cámara de Streamlit
+camera_input = st.camera_input("Captura desde tu cámara")
+
 if camera_input:
     # Convertir la imagen capturada en un formato adecuado para YOLO
     frame = np.array(camera_input)
