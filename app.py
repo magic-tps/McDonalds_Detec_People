@@ -15,27 +15,30 @@ st.title("Detección de Personas en Tiempo Real")
 start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
 stframe = st.empty()  # Espacio para mostrar el video
 
-# Inicializar la cámara
-cap = cv2.VideoCapture(0)
+# Intentar abrir la cámara con distintos índices
+cap = None
+for i in range(3):  # Intentar con los primeros 3 dispositivos de cámara
+    cap = cv2.VideoCapture(i)
+    if cap.isOpened():
+        break
 
-def alerta_sonora():
-    """Genera una alerta sonora cuando se detecta una persona."""
-    try:
-        audio_file = open("audio.wav", "rb").read()
-        audio_base64 = base64.b64encode(audio_file).decode('utf-8')
-        audio_html = f"""
-        <audio autoplay>
-            <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
-        </audio>
-        """
-        components.html(audio_html, height=0)
-    except Exception as e:
-        st.error(f"Error al cargar el archivo de audio: {e}")
-
-# Verificar si la cámara está disponible
-if not cap.isOpened():
+if not cap or not cap.isOpened():
     st.error("No se pudo acceder a la cámara.")
 else:
+    def alerta_sonora():
+        """Genera una alerta sonora cuando se detecta una persona."""
+        try:
+            audio_file = open("audio.wav", "rb").read()
+            audio_base64 = base64.b64encode(audio_file).decode('utf-8')
+            audio_html = f"""
+            <audio autoplay>
+                <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
+            </audio>
+            """
+            components.html(audio_html, height=0)
+        except Exception as e:
+            st.error(f"Error al cargar el archivo de audio: {e}")
+
     while start:
         ret, frame = cap.read()
         if not ret:
@@ -68,4 +71,4 @@ else:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         stframe.image(frame, channels="RGB", use_column_width=True)
 
-cap.release()
+    cap.release()
