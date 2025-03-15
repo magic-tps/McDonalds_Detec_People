@@ -19,7 +19,6 @@ camera_input = st.camera_input("Captura desde tu cámara")
 
 # Función para emitir una alerta sonora utilizando HTML y JavaScript
 def alerta_sonora():
-    # Puedes cambiar la URL por un archivo de sonido diferente si prefieres otro
     sound_html = """
     <script>
         var audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
