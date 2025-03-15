@@ -1,11 +1,7 @@
 import streamlit as st
 import numpy as np
-import cv2
-import pygame
 from ultralytics import YOLO
-
-# Inicializar pygame para el sonido
-pygame.mixer.init()
+import cv2
 
 # Cargar el modelo YOLOv8
 model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisión
@@ -14,16 +10,11 @@ model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisió
 st.title("Detección de Personas en Tiempo Real")
 start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
 
-stframe = st.empty()  # Espacio para mostrar el video
+stframe = st.empty()  # Espacio para mostrar la imagen
+frame = None
 
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
-
-# Función para generar un beep usando pygame
-def alerta_sonora():
-    frequency = 1000  # Frecuencia del beep en Hz
-    duration = 500  # Duración del beep en milisegundos
-    pygame.mixer.Sound(pygame.sndarray.make_sound(np.sin(2 * np.pi * frequency * np.arange(44100 * duration / 1000) / 44100) * 32767).play())
 
 # Verificar si se ha capturado una imagen
 if camera_input:
@@ -48,10 +39,6 @@ if camera_input:
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame, f"Person {conf:.2f}", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-    # Si detectó una persona, activar la alerta sonora
-    if detected:
-        alerta_sonora()
 
     # Mostrar la imagen con detección en Streamlit
     stframe.image(frame, channels="BGR", use_column_width=True)
