@@ -19,7 +19,7 @@ camera_input = st.camera_input("Captura desde tu cámara")
 # Función para generar una alerta sonora utilizando st.audio()
 def alerta_sonora():
     try:
-        # Subir un archivo de audio a la app
+        # Subir el archivo de audio a la app
         audio_file = open("audio.wav", "rb").read()  # Asegúrate de tener el archivo en el mismo directorio
         st.audio(audio_file, format="audio/wav", start_time=0)
     except Exception as e:
