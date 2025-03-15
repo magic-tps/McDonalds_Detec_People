@@ -1,8 +1,9 @@
 import streamlit as st
 import numpy as np
-from ultralytics import YOLO
 import cv2
-import streamlit.components.v1 as components
+import platform
+import winsound  # Solo en Windows
+from ultralytics import YOLO
 
 # Cargar el modelo YOLOv8
 model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisión
@@ -11,21 +12,20 @@ model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisió
 st.title("Detección de Personas en Tiempo Real")
 start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
 
-stframe = st.empty()  # Espacio para mostrar la imagen
-frame = None
+stframe = st.empty()  # Espacio para mostrar el video
 
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
 
-# Función para emitir una alerta sonora utilizando HTML y JavaScript
+# Función para generar un beep usando el sistema
 def alerta_sonora():
-    sound_html = """
-    <script>
-        var audio = new Audio('https://www.soundjay.com/button/beep-07.wav');
-        audio.play();
-    </script>
-    """
-    components.html(sound_html)
+    sistema = platform.system()
+    if sistema == "Windows":
+        # Para Windows, usamos winsound
+        winsound.Beep(1000, 500)  # Frecuencia de 1000 Hz y duración de 500 ms
+    else:
+        # En otros sistemas operativos usamos un comando de terminal
+        print("\a")  # '\a' es el código ASCII para un beep en terminal
 
 # Verificar si se ha capturado una imagen
 if camera_input:
