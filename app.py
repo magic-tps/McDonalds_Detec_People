@@ -1,11 +1,7 @@
 import streamlit as st
 import numpy as np
 import cv2
-import pygame  # Usaremos pygame para reproducir el sonido
 from ultralytics import YOLO
-
-# Inicializamos pygame para reproducir sonidos
-pygame.mixer.init()
 
 # Cargar el modelo YOLOv8
 model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisión
@@ -20,10 +16,11 @@ frame = None
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
 
-# Función para generar una alerta sonora
+# Función para generar una alerta sonora utilizando st.audio()
 def alerta_sonora():
-    pygame.mixer.music.load("https://www.soundjay.com/button/beep-07.wav")  # Usar un sonido predefinido
-    pygame.mixer.music.play()
+    # Usar una URL de un archivo de audio en formato .mp3 o .wav
+    audio_file = "https://www.soundjay.com/button/beep-07.wav"  # O reemplaza por una URL de tu propio sonido
+    st.audio(audio_file, format="audio/wav", start_time=0)
 
 # Verificar si se ha capturado una imagen
 if camera_input:
