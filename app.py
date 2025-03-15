@@ -14,7 +14,7 @@ st.title("Detección de Personas en Tiempo Real")
 start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
 
 stframe = st.empty()  # Espacio para mostrar el video
-cap = cv2.VideoCapture(0)  # Iniciar cámara
+cap = cv2.VideoCapture(1)  # Iniciar cámara
 
 # Función para generar una alerta sonora
 def alerta_sonora():
