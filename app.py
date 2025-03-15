@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import platform
 import os
-import pygame
 from ultralytics import YOLO
 
 # Cargar el modelo YOLOv8
@@ -14,7 +13,6 @@ st.title("Detección de Personas en Tiempo Real")
 start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
 
 stframe = st.empty()  # Espacio para mostrar el video
-cap = cv2.VideoCapture(0)  # Iniciar cámara
 
 # Función para generar una alerta sonora
 def alerta_sonora():
@@ -25,11 +23,28 @@ def alerta_sonora():
     else:
         os.system("printf '\a'")  # Beep en Linux/macOS
 
+# Configurar la cámara (usando DroidCam o la cámara web local)
+camera_option = st.radio(
+    "Selecciona la fuente de la cámara:",
+    ("Cámara Web Local", "DroidCam (Celular)")
+)
+
+if camera_option == "Cámara Web Local":
+    cap = cv2.VideoCapture(0)  # Usar la cámara web local
+else:
+    droidcam_ip = st.text_input("Ingresa la dirección IP de DroidCam (ejemplo: 192.168.1.100):")
+    droidcam_port = st.text_input("Ingresa el puerto de DroidCam (por defecto: 4747):", "4747")
+    if droidcam_ip and droidcam_port:
+        cap = cv2.VideoCapture(f"http://{droidcam_ip}:{droidcam_port}/video")  # Usar DroidCam
+    else:
+        st.warning("Por favor, ingresa la dirección IP y el puerto de DroidCam.")
+        cap = None
+
 # Verificar si la cámara está disponible
-if not cap.isOpened():
+if cap is not None and not cap.isOpened():
     st.error("No se pudo acceder a la cámara.")
 else:
-    while start:
+    while start and cap is not None:
         ret, frame = cap.read()
         if not ret:
             st.error("Error al capturar el video.")
@@ -61,4 +76,5 @@ else:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         stframe.image(frame, channels="RGB", use_column_width=True)
 
-cap.release()
+if cap is not None:
+    cap.release()
