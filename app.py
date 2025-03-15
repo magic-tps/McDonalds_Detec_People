@@ -15,17 +15,27 @@ start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
 # Widget para subir un archivo de audio
 uploaded_audio = st.file_uploader("Sube un archivo de sonido (formato WAV)", type=["wav"])
 
+# Sonido predeterminado
+DEFAULT_AUDIO_PATH = "default_audio.wav"  # Asegúrate de tener este archivo en el mismo directorio
+
 stframe = st.empty()  # Espacio para mostrar el video
 
 # Función para generar una alerta sonora
 def alerta_sonora(audio_file):
     audio_html = """
-    <audio autoplay>
+    <audio id="audio" controls>
         <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
     </audio>
+    <script>
+        document.getElementById("audio").play();
+    </script>
     """
     try:
-        audio_base64 = base64.b64encode(audio_file.read()).decode('utf-8')
+        if audio_file is not None:
+            audio_base64 = base64.b64encode(audio_file.read()).decode('utf-8')
+        else:
+            with open(DEFAULT_AUDIO_PATH, "rb") as f:
+                audio_base64 = base64.b64encode(f.read()).decode('utf-8')
         components.html(audio_html.format(audio_base64=audio_base64), height=0)
     except Exception as e:
         st.error(f"Error al reproducir el archivo de audio: {e}")
@@ -56,8 +66,8 @@ if camera_input and start:
                 cv2.putText(frame, f"Person {conf:.2f}", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-    # Si detectó una persona y se subió un archivo de audio, activar la alerta sonora
-    if detected and uploaded_audio is not None:
+    # Si detectó una persona, activar la alerta sonora
+    if detected:
         alerta_sonora(uploaded_audio)
 
     # Mostrar la imagen con detección en Streamlit
