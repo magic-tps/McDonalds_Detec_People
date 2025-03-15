@@ -2,6 +2,8 @@ import streamlit as st
 import numpy as np
 import cv2
 from ultralytics import YOLO
+import base64
+import streamlit.components.v1 as components
 
 # Cargar el modelo YOLOv8
 model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisión
@@ -16,14 +18,16 @@ frame = None
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
 
-# Función para generar una alerta sonora utilizando st.audio()
+# Función para generar una alerta sonora utilizando JavaScript
 def alerta_sonora():
-    try:
-        # Subir el archivo de audio a la app
-        audio_file = open("audio.wav", "rb").read()  # Asegúrate de tener el archivo en el mismo directorio
-        st.audio(audio_file, format="audio/wav", start_time=0)
-    except Exception as e:
-        st.error(f"Error al cargar el archivo de audio: {e}")
+    audio_html = """
+    <audio autoplay>
+        <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
+    </audio>
+    """
+    audio_file = open("audio.wav", "rb").read()
+    audio_base64 = base64.b64encode(audio_file).decode('utf-8')
+    components.html(audio_html.format(audio_base64=audio_base64), height=0)
 
 # Verificar si se ha capturado una imagen
 if camera_input:
