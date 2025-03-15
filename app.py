@@ -1,9 +1,11 @@
 import streamlit as st
 import numpy as np
 import cv2
-import platform
-import playsound  # Usaremos playsound para reproducir audio
+import pygame
 from ultralytics import YOLO
+
+# Inicializar pygame para el sonido
+pygame.mixer.init()
 
 # Cargar el modelo YOLOv8
 model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisión
@@ -17,13 +19,11 @@ stframe = st.empty()  # Espacio para mostrar el video
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
 
-# Función para generar una alerta sonora usando playsound
+# Función para generar un beep usando pygame
 def alerta_sonora():
-    try:
-        # Reproducir un archivo de sonido cuando se detecta una persona
-        playsound.playsound("alerta.wav", block=False)
-    except Exception as e:
-        st.error(f"Error al reproducir sonido: {e}")
+    frequency = 1000  # Frecuencia del beep en Hz
+    duration = 500  # Duración del beep en milisegundos
+    pygame.mixer.Sound(pygame.sndarray.make_sound(np.sin(2 * np.pi * frequency * np.arange(44100 * duration / 1000) / 44100) * 32767).play())
 
 # Verificar si se ha capturado una imagen
 if camera_input:
