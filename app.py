@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import cv2
 import platform
-import winsound  # Solo en Windows
+import playsound  # Usaremos playsound para reproducir audio
 from ultralytics import YOLO
 
 # Cargar el modelo YOLOv8
@@ -17,15 +17,13 @@ stframe = st.empty()  # Espacio para mostrar el video
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
 
-# Función para generar un beep usando el sistema
+# Función para generar una alerta sonora usando playsound
 def alerta_sonora():
-    sistema = platform.system()
-    if sistema == "Windows":
-        # Para Windows, usamos winsound
-        winsound.Beep(1000, 500)  # Frecuencia de 1000 Hz y duración de 500 ms
-    else:
-        # En otros sistemas operativos usamos un comando de terminal
-        print("\a")  # '\a' es el código ASCII para un beep en terminal
+    try:
+        # Reproducir un archivo de sonido cuando se detecta una persona
+        playsound.playsound("alerta.wav", block=False)
+    except Exception as e:
+        st.error(f"Error al reproducir sonido: {e}")
 
 # Verificar si se ha capturado una imagen
 if camera_input:
