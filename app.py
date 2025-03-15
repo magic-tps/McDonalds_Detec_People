@@ -1,8 +1,6 @@
 import streamlit as st
 import cv2
 import numpy as np
-import platform
-import os
 import base64
 import streamlit.components.v1 as components
 from ultralytics import YOLO
@@ -14,21 +12,23 @@ model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisió
 st.title("Detección de Personas en Tiempo Real")
 start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
 
+# Widget para subir un archivo de audio
+uploaded_audio = st.file_uploader("Sube un archivo de sonido (formato WAV)", type=["wav"])
+
 stframe = st.empty()  # Espacio para mostrar el video
 
 # Función para generar una alerta sonora
-def alerta_sonora():
+def alerta_sonora(audio_file):
     audio_html = """
     <audio autoplay>
         <source src="data:audio/wav;base64,{audio_base64}" type="audio/wav">
     </audio>
     """
     try:
-        audio_file = open("audio.wav", "rb").read()
-        audio_base64 = base64.b64encode(audio_file).decode('utf-8')
+        audio_base64 = base64.b64encode(audio_file.read()).decode('utf-8')
         components.html(audio_html.format(audio_base64=audio_base64), height=0)
     except Exception as e:
-        st.error(f"Error al cargar el archivo de audio: {e}")
+        st.error(f"Error al reproducir el archivo de audio: {e}")
 
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
@@ -56,9 +56,9 @@ if camera_input and start:
                 cv2.putText(frame, f"Person {conf:.2f}", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-    # Si detectó una persona, activar la alerta sonora
-    if detected:
-        alerta_sonora()
+    # Si detectó una persona y se subió un archivo de audio, activar la alerta sonora
+    if detected and uploaded_audio is not None:
+        alerta_sonora(uploaded_audio)
 
     # Mostrar la imagen con detección en Streamlit
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
