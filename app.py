@@ -1,20 +1,22 @@
 import streamlit as st
-import numpy as np
 import cv2
-from ultralytics import YOLO
+import numpy as np
+import platform
+import os
 import base64
 import streamlit.components.v1 as components
+from ultralytics import YOLO
 
 # Cargar el modelo YOLOv8
-model = YOLO("yolov8n.pt")
+model = YOLO("yolov8n.pt")  # Puedes cambiar a 'yolov8s.pt' para mayor precisión
 
 # Configurar Streamlit
 st.title("Detección de Personas en Tiempo Real")
-start = st.checkbox("Iniciar detección")
+start = st.checkbox("Iniciar detección")  # Botón de encendido/apagado
 
-stframe = st.empty()  # Espacio para mostrar la imagen
+stframe = st.empty()  # Espacio para mostrar el video
 
-# Función para generar una alerta sonora utilizando JavaScript
+# Función para generar una alerta sonora
 def alerta_sonora():
     audio_html = """
     <audio autoplay>
@@ -31,7 +33,7 @@ def alerta_sonora():
 # Usar el widget de cámara de Streamlit
 camera_input = st.camera_input("Captura desde tu cámara")
 
-if camera_input:
+if camera_input and start:
     # Convertir la imagen capturada en un formato adecuado para YOLO
     frame = np.array(camera_input)
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # Convertir de RGB a BGR
@@ -59,4 +61,5 @@ if camera_input:
         alerta_sonora()
 
     # Mostrar la imagen con detección en Streamlit
-    stframe.image(frame, channels="BGR", use_column_width=True)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    stframe.image(frame, channels="RGB", use_column_width=True)
